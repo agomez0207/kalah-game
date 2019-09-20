@@ -1,27 +1,14 @@
 package com.backbase.game.service.bo;
 
-
-import java.util.List;
-
 public enum Player {
 
-    FIRST_PLAYER(BoardConfig.PLAYER_PITS, BoardConfig.FIRST_PLAYER_KALAH ),
-    SECOND_PLAYER(BoardConfig.PLAYER_PITS, BoardConfig.SECOND_PLAYER_KALAH);
+    FIRST_PLAYER(BoardConfig.FIRST_PLAYER_KALAH ),
+    SECOND_PLAYER(BoardConfig.SECOND_PLAYER_KALAH);
 
-    private List<Integer> pits;
     private int kalahId;
 
-    Player(List<Integer> pits, int kalahId) {
-        this.pits = pits;
+    Player(int kalahId) {
         this.kalahId = kalahId;
-    }
-
-    public List<Integer> getPits() {
-        return pits;
-    }
-
-    public void setPits(List<Integer> pits) {
-        this.pits = pits;
     }
 
     public int getKalahId() {

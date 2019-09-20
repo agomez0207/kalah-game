@@ -48,19 +48,22 @@ class GameServiceImpl implements GameService {
         if (gameDAO.isPresent()) {
             Game game = gameMapper.getGame(gameDAO.get());
 
-            moveStones(game, pitId);
+            if (isValidMove(game, pitId)){
+                moveStones(game, pitId);
+                gameRepository.save(gameMapper.getGameDAO(game));
 
-            gameRepository.save(gameMapper.getGameDAO(game));
+                return game;
+            }
 
-            return game;
+            // throws move not valid exception
+            return new Game();
         }
-
 
         // throws game not found exception
         return new Game();
     }
 
-    private void moveStones(Game game, int pitId) {
+    void moveStones(Game game, int pitId) {
         Map<Integer, Integer> board = game.getBoard();
         Player player = Player.valueOf(game.getCurrentPlayer());
         int pitStones = board.get(pitId);
@@ -68,9 +71,16 @@ class GameServiceImpl implements GameService {
 
         //Need to make validation of opponent kalah.
         for(int i = pitId + 1; i <= pitId + pitStones; i++) {
-            board.put(i, board.get(i) + 1 );
+
+            int pitToFill = i;
+
+            if(i > BoardConfig.SECOND_PLAYER_KALAH) {
+                pitToFill = i - BoardConfig.SECOND_PLAYER_KALAH;
+            }
+
+            board.put(pitToFill, board.get(pitToFill) + 1 );
             //Last stone
-            if (i == pitId + pitStones) {
+            if (pitToFill == pitId + pitStones) {
                 int lastPitStone = pitId + pitStones;
 
                 // If last pit stone is empty takes opponent stones and loose turn
@@ -82,7 +92,6 @@ class GameServiceImpl implements GameService {
                     game.setCurrentPlayer(player.getOppositePlayer().toString());
                 }
 
-
                 if(player.getKalahId() == lastPitStone) {
                     //Player Keep playing
                 }
@@ -91,5 +100,23 @@ class GameServiceImpl implements GameService {
                 }
             }
         }
+    }
+
+    boolean isValidMove(Game game, int starterPit) {
+        boolean validMove = false;
+        Player currentPlayer = Player.valueOf(game.getCurrentPlayer());
+
+        switch (currentPlayer){
+            case FIRST_PLAYER:
+                validMove = starterPit < BoardConfig.FIRST_PLAYER_KALAH;
+                break;
+            case SECOND_PLAYER:
+                validMove = starterPit < BoardConfig.SECOND_PLAYER_KALAH && starterPit > BoardConfig.FIRST_PLAYER_KALAH;
+                break;
+            default:
+                break;
+        }
+
+        return validMove;
     }
 }
