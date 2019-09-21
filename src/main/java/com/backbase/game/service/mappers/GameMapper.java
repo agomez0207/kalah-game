@@ -2,6 +2,7 @@ package com.backbase.game.service.mappers;
 
 import com.backbase.game.repository.dao.GameDAO;
 import com.backbase.game.service.bo.Game;
+import com.backbase.game.service.bo.Player;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,7 +14,7 @@ public class GameMapper {
         gameDAO.setId(game.getId());
         gameDAO.setUri(game.getUri());
         gameDAO.setBoard(game.getBoard());
-        gameDAO.setCurrentPlayer(game.getCurrentPlayer());
+        gameDAO.setCurrentPlayer(game.getCurrentPlayer().toString());
 
         return gameDAO;
     }
@@ -25,7 +26,7 @@ public class GameMapper {
         game.setId(gameDAO.getId());
         game.setUri(gameDAO.getUri());
         game.setBoard(gameDAO.getBoard());
-        game.setCurrentPlayer(gameDAO.getCurrentPlayer());
+        game.setCurrentPlayer(Player.valueOf(gameDAO.getCurrentPlayer()));
 
         return game;
     }

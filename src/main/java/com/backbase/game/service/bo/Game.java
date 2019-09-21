@@ -8,7 +8,7 @@ public class Game {
 
     private int id;
     private String uri;
-    private String currentPlayer;
+    private Player currentPlayer;
     private Map<Integer, Integer> board;
 
     public int getId() {
@@ -23,7 +23,7 @@ public class Game {
         return board;
     }
 
-    public String getCurrentPlayer() {
+    public Player getCurrentPlayer() {
         return currentPlayer;
     }
 
@@ -39,7 +39,7 @@ public class Game {
         this.board = board;
     }
 
-    public void setCurrentPlayer(String currentPlayer) {
+    public void setCurrentPlayer(Player currentPlayer) {
         this.currentPlayer = currentPlayer;
     }
 }

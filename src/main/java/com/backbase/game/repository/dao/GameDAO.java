@@ -19,6 +19,8 @@ public class GameDAO {
 
     private String currentPlayer;
 
+    private String gameStatus;
+
     private String uri;
 
     public GameDAO() {

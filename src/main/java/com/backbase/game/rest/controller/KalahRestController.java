@@ -1,4 +1,4 @@
-package com.backbase.game.rest;
+package com.backbase.game.rest.controller;
 
 import com.backbase.game.rest.dtos.GameDTO;
 import com.backbase.game.rest.dtos.NewGameDTO;
