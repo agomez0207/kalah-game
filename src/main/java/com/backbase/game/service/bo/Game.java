@@ -8,6 +8,7 @@ public class Game {
 
     private int id;
     private String uri;
+    private GameStatus status;
     private Player currentPlayer;
     private Map<Integer, Integer> board;
 
@@ -17,6 +18,10 @@ public class Game {
 
     public String getUri() {
         return uri;
+    }
+
+    public GameStatus getStatus(){
+        return this.status;
     }
 
     public Map<Integer, Integer> getBoard() {
@@ -33,6 +38,10 @@ public class Game {
 
     public void setUri(String uri) {
         this.uri = uri;
+    }
+
+    public void setStatus(GameStatus status) {
+        this.status = status;
     }
 
     public void setBoard(Map<Integer, Integer> board) {

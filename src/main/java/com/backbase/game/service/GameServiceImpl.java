@@ -4,14 +4,16 @@ import com.backbase.game.repository.GameRepository;
 import com.backbase.game.repository.dao.GameDAO;
 import com.backbase.game.service.bo.BoardConfig;
 import com.backbase.game.service.bo.Game;
+import com.backbase.game.service.bo.GameStatus;
 import com.backbase.game.service.bo.Player;
+import com.backbase.game.service.exceptions.GameFinishedException;
 import com.backbase.game.service.exceptions.GameNotFoundException;
 import com.backbase.game.service.mappers.GameMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.IntStream;
 
 @Service
 class GameServiceImpl implements GameService {
@@ -21,15 +23,14 @@ class GameServiceImpl implements GameService {
     private GameUtils gameUtils;
 
     GameServiceImpl(
-            GameRepository gameRepository, GameMapper gameMapper, GameUtils gameUtils) {
+            final GameRepository gameRepository, final GameMapper gameMapper, final GameUtils gameUtils) {
         this.gameRepository = gameRepository;
         this.gameMapper = gameMapper;
         this.gameUtils = gameUtils;
     }
 
     @Override
-    public Game createGame(String uri) {
-
+    public Game createGame(final String uri) {
         Map<Integer, Integer> initialBoard = BoardConfig.INITIAL_BOARD;
 
         Game newGame = new Game();
@@ -37,6 +38,7 @@ class GameServiceImpl implements GameService {
         newGame.setUri(uri);
         newGame.setBoard(initialBoard);
         newGame.setCurrentPlayer(Player.FIRST_PLAYER);
+        newGame.setStatus(GameStatus.IN_PROGRESS);
 
         Game gameCreated = gameMapper.getGame(gameRepository.save(gameMapper.getGameDAO(newGame)));
 
@@ -46,21 +48,71 @@ class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Game makeMove(int gameId, int pitId) {
-
+    public Game makeMove(final int gameId, final int pitId) {
         Optional<GameDAO> gameDAO = gameRepository.findById(gameId);
 
         if (gameDAO.isPresent()) {
             Game game = gameMapper.getGame(gameDAO.get());
 
-            gameUtils.moveStones(game, pitId);
-            gameRepository.save(gameMapper.getGameDAO(game));
+            if (game.getStatus() != GameStatus.IN_PROGRESS) {
+                throw new GameFinishedException(
+                        String.format("The game has been already finished with status of %s", game.getStatus()));
+            }
 
-            //validate winner
+            Map<Integer, Integer> board = game.getBoard();
+            Player currentPlayer = game.getCurrentPlayer();
+            gameUtils.moveStones(game, pitId);
+
+            if (isGameFinished(game)) {
+                finishGame(game);
+            }
+
+            gameRepository.save(gameMapper.getGameDAO(game));
 
             return game;
         }
 
         throw new GameNotFoundException(String.format("Game with id %d not found", gameId));
+    }
+
+    private boolean isGameFinished(Game game) {
+        boolean gameFinished = false;
+        Player currentPlayer = game.getCurrentPlayer();
+        Player oppositePlayer = game.getCurrentPlayer().getOppositePlayer();
+        Map<Integer, Integer> board = game.getBoard();
+        List<Integer> currentPlayerPits = currentPlayer.getPlayerPits();
+        List<Integer> oppositePlayerPits = oppositePlayer.getPlayerPits();
+
+        int currentPlayerTotalStones =
+                currentPlayerPits.stream().map(board::get).reduce(0, Integer::sum);
+
+        int oppositePlayerTotalStones =
+                oppositePlayerPits.stream().map(board::get).reduce(0, Integer::sum);
+
+        if (currentPlayerTotalStones == 0 || oppositePlayerTotalStones == 0) {
+            int currentPlayerKalahStones = board.get(currentPlayer.getKalahId());
+            int oppositePlayerKalahStones = board.get(oppositePlayer.getKalahId());
+
+            board.put(currentPlayer.getKalahId(), currentPlayerKalahStones + currentPlayerTotalStones);
+            board.put(oppositePlayer.getKalahId(), oppositePlayerKalahStones + oppositePlayerTotalStones);
+
+            gameFinished = true;
+        }
+
+        return gameFinished;
+    }
+
+    private void finishGame(Game game) {
+        Map<Integer, Integer> board = game.getBoard();
+        int currentPlayerKalahStones = board.get(BoardConfig.FIRST_PLAYER_KALAH);
+        int oppositePlayerKalahStones = board.get(BoardConfig.SECOND_PLAYER_KALAH);
+
+        if (currentPlayerKalahStones > oppositePlayerKalahStones) {
+            game.setStatus(GameStatus.FIRST_PLAYER_WON);
+        } else if (oppositePlayerKalahStones > currentPlayerKalahStones) {
+            game.setStatus(GameStatus.SECOND_PLAYER_WON);
+        } else {
+            game.setStatus(GameStatus.DREW);
+        }
     }
 }

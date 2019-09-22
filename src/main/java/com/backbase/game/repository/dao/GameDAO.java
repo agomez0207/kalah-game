@@ -1,10 +1,18 @@
 package com.backbase.game.repository.dao;
 
-
-import javax.persistence.*;
-import java.util.HashMap;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.GeneratedValue;
+import javax.persistence.ElementCollection;
+import javax.persistence.MapKeyColumn;
+import javax.persistence.Column;
 import java.util.Map;
 
+/**
+ * Data access object (DAO) representing a game.
+ *
+ * @author andres.gomez
+ */
 @Entity(name = "game")
 public class GameDAO {
 
@@ -19,7 +27,7 @@ public class GameDAO {
 
     private String currentPlayer;
 
-    private String gameStatus;
+    private String status;
 
     private String uri;
 
@@ -46,6 +54,10 @@ public class GameDAO {
         return board;
     }
 
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     public void setBoard(Map<Integer, Integer> board) {
         this.board = board;
     }
@@ -54,9 +66,12 @@ public class GameDAO {
         this.currentPlayer = currentPlayer;
     }
 
-
     public String getUri() {
         return uri;
+    }
+
+    public String getStatus() {
+        return status;
     }
 
     public void setUri(String uri) {

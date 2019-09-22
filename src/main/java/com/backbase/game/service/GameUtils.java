@@ -8,62 +8,83 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+/**
+ * Utility service class that move the stones and contains some of the rules of the game
+ * such as if a player keeps or loose his/her turn.
+ *
+ * @author andres.gomez
+ */
 @Component
 class GameUtils {
 
-    void moveStones(Game game, int pitId) {
+    /**
+     * Moves stones starting from the required {@param pitId} only if it's a valid move.
+     *
+     * @param game Game instance to be used.
+     * @param pitId Pit id to move the stones from.
+     *
+     * @throws MoveNotValidException if a player tries to move the stones from
+     * a pit and it's not his/her turn or if tries to move the opponent stones.
+     */
+    void moveStones(Game game, final int pitId) {
+        Player player = game.getCurrentPlayer();
 
-        if (!isValidMove(game, pitId)) {
+        if (!isValidMove(player, pitId)) {
             throw new MoveNotValidException(
-                    String.format("The stones on the pit ID %d cannot be moved", pitId));
+                String.format("The stones on the pit ID %d cannot be moved", pitId));
         }
 
         Map<Integer, Integer> board = game.getBoard();
-        Player player = game.getCurrentPlayer();
         int stones = board.get(pitId);
         int lastFilledPit = 0;
         board.put(pitId, 0);
 
         for (int i = pitId + 1; i <= pitId + stones; i++) {
-
-            lastFilledPit = i;
+            lastFilledPit = convertOverflowPitId(i);
 
             // Stone cannot be put on opponent kalah
             if (player.getOppositePlayer().getKalahId() == lastFilledPit) {
                 i++;
                 stones++;
+                lastFilledPit = convertOverflowPitId(i);
             }
-
-            if (i > BoardConfig.SECOND_PLAYER_KALAH) {
-                lastFilledPit = i - BoardConfig.SECOND_PLAYER_KALAH;
-            }
-
             board.put(lastFilledPit, board.get(lastFilledPit) + 1 );
         }
-        checkLastPit(game, lastFilledPit);
+        game.setCurrentPlayer(getNextPlayerLastPit(player, board, lastFilledPit));
     }
 
-    private void checkLastPit(Game game, int lastPit){
-        Player player = game.getCurrentPlayer();
-        Map<Integer, Integer> board = game.getBoard();
+    /**
+     * Helper method that determines if the player loose his/her turn and/or takes
+     * opponent's pit stones.
+     *
+     * @param player Current player.
+     * @param board Board of the game.
+     * @param lastPit Pit ID where the last stone landed.
+     * @return The next player to play.
+     */
+    private Player getNextPlayerLastPit(
+            final Player player, Map<Integer, Integer> board, final int lastPit) {
+        Player currentPlayer = player;
 
-        if (player.getKalahId() != lastPit) {
-            game.setCurrentPlayer(player.getOppositePlayer());
+        if (board.get(lastPit) == 1 && isValidMove(player, lastPit)) {
+            takesOpponentStones(player, board, lastPit);
+            currentPlayer = player.getOppositePlayer();
+        } else if (player.getKalahId() != lastPit) {
+            currentPlayer = player.getOppositePlayer();
         }
 
-        // If last pit stone is empty takes opponent stones and loose turn
-        else if (board.get(lastPit) == 0) {
-            int opponentPit = BoardConfig.SECOND_PLAYER_KALAH - lastPit;
-            int opponentStones = board.get(opponentPit);
-            board.put(opponentPit, 0);
-            board.put(player.getKalahId(), opponentStones + 1);
-            game.setCurrentPlayer(player.getOppositePlayer());
-        }
+        return currentPlayer;
     }
 
-    private boolean isValidMove(Game game, int starterPit) {
+    /**
+     * Checks if the move of stones is valid.
+     *
+     * @param currentPlayer Player that makes the move.
+     * @param starterPit Starter pit ID of the move.
+     * @return True if the move is valid otherwise will returns false.
+     */
+    private boolean isValidMove(Player currentPlayer, int starterPit) {
         boolean validMove = false;
-        Player currentPlayer = game.getCurrentPlayer();
 
         switch (currentPlayer){
             case FIRST_PLAYER:
@@ -77,5 +98,31 @@ class GameUtils {
         }
 
         return validMove;
+    }
+
+    /**
+     * Converts a pit ID to its board equivalent if the pit ID is greater than the maximum of pits.
+     *
+     * @param pitId Pit ID to be converted.
+     * @return The pit ID converted to its board equivalent.
+     */
+    private int convertOverflowPitId(int pitId) {
+        return pitId > BoardConfig.SECOND_PLAYER_KALAH ? pitId - BoardConfig.SECOND_PLAYER_KALAH : pitId;
+    }
+
+    /**
+     * Takes all stones of the opponent and updates the board.
+     *
+     * @param player Player that will take the stones.
+     * @param board Board of the game.
+     * @param pitId Pit ID of the player to take opponent's stones.
+     */
+    private void takesOpponentStones(Player player, Map<Integer, Integer> board, int pitId) {
+        int currentPlayerKalahStones = board.get(player.getKalahId());
+        int opponentPit = BoardConfig.SECOND_PLAYER_KALAH - pitId;
+        int opponentStones = board.get(opponentPit);
+        board.put(opponentPit, 0);
+        board.put(pitId, 0);
+        board.put(player.getKalahId(), opponentStones + currentPlayerKalahStones + 1);
     }
 }
