@@ -9,12 +9,16 @@ import com.backbase.game.service.bo.Player;
 import com.backbase.game.service.exceptions.GameFinishedException;
 import com.backbase.game.service.exceptions.GameNotFoundException;
 import com.backbase.game.service.mappers.GameMapper;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * @see GameService
+ */
 @Service
 class GameServiceImpl implements GameService {
 
@@ -29,6 +33,9 @@ class GameServiceImpl implements GameService {
         this.gameUtils = gameUtils;
     }
 
+    /**
+     * @see GameService#createGame(String)
+     */
     @Override
     public Game createGame(final String uri) {
         Map<Integer, Integer> initialBoard = BoardConfig.INITIAL_BOARD;
@@ -47,6 +54,9 @@ class GameServiceImpl implements GameService {
         return gameMapper.getGame(gameRepository.save(gameMapper.getGameDAO(gameCreated)));
     }
 
+    /**
+     * @see GameService#makeMove(int, int)
+     */
     @Override
     public Game makeMove(final int gameId, final int pitId) {
         Optional<GameDAO> gameDAO = gameRepository.findById(gameId);
@@ -59,22 +69,27 @@ class GameServiceImpl implements GameService {
                         String.format("The game has been already finished with status of %s", game.getStatus()));
             }
 
-            Map<Integer, Integer> board = game.getBoard();
-            Player currentPlayer = game.getCurrentPlayer();
-            gameUtils.moveStones(game, pitId);
+            Game gameUpdated = gameUtils.moveStones(game, pitId);
 
-            if (isGameFinished(game)) {
-                finishGame(game);
+            if (isGameFinished(gameUpdated)) {
+                finishGame(gameUpdated);
             }
 
-            gameRepository.save(gameMapper.getGameDAO(game));
+            gameRepository.save(gameMapper.getGameDAO(gameUpdated));
 
-            return game;
+            return gameUpdated;
         }
 
         throw new GameNotFoundException(String.format("Game with id %d not found", gameId));
     }
 
+    /**
+     * Determines whether a game is finished (one of the sides ran out of stones), if it is,
+     * the player who still has stones in his/her pits keeps them and puts them in his/hers Kalah.
+     *
+     * @param game Game to be validated.
+     * @return True if the game have finished otherwise will returns false.
+     */
     private boolean isGameFinished(Game game) {
         boolean gameFinished = false;
         Player currentPlayer = game.getCurrentPlayer();
@@ -102,6 +117,11 @@ class GameServiceImpl implements GameService {
         return gameFinished;
     }
 
+    /**
+     * Finish a game changing its status.
+     *
+     * @param game Game to be finished.
+     */
     private void finishGame(Game game) {
         Map<Integer, Integer> board = game.getBoard();
         int currentPlayerKalahStones = board.get(BoardConfig.FIRST_PLAYER_KALAH);

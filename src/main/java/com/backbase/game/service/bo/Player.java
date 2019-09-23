@@ -2,6 +2,11 @@ package com.backbase.game.service.bo;
 
 import java.util.List;
 
+/**
+ * Business object representing a player of a game.
+ *
+ * @author andres.gomez
+ */
 public enum Player {
 
     FIRST_PLAYER(BoardConfig.FIRST_PLAYER_KALAH, BoardConfig.FIRST_PLAYER_PITS),
@@ -19,14 +24,6 @@ public enum Player {
         return kalahId;
     }
 
-    public void setKalahId(int kalahId) {
-        this.kalahId = kalahId;
-    }
-
-    public String getPlayer(){
-        return this.toString();
-    }
-
     public Player getOppositePlayer() {
         return this == FIRST_PLAYER ? SECOND_PLAYER : FIRST_PLAYER;
     }
@@ -34,9 +31,4 @@ public enum Player {
     public List<Integer> getPlayerPits() {
         return this.playerPits;
     }
-
-    public void setPlayerPits(List<Integer> playerPits) {
-        this.playerPits = playerPits;
-    }
-
 }

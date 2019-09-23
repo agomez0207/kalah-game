@@ -26,31 +26,39 @@ class GameUtils {
      * @throws MoveNotValidException if a player tries to move the stones from
      * a pit and it's not his/her turn or if tries to move the opponent stones.
      */
-    void moveStones(Game game, final int pitId) {
+    Game moveStones(Game game, final int pitId) {
         Player player = game.getCurrentPlayer();
 
-        if (!isValidMove(player, pitId)) {
+        if (!isValidMove(player, pitId) || game.getBoard().get(pitId) == 0) {
             throw new MoveNotValidException(
-                String.format("The stones on the pit ID %d cannot be moved", pitId));
+                String.format("The stones on the pit ID %d cannot be moved or the pit is empty", pitId));
         }
 
         Map<Integer, Integer> board = game.getBoard();
-        int stones = board.get(pitId);
-        int lastFilledPit = 0;
-        board.put(pitId, 0);
+        int secondPlayerKalah = BoardConfig.SECOND_PLAYER_KALAH;
 
-        for (int i = pitId + 1; i <= pitId + stones; i++) {
-            lastFilledPit = convertOverflowPitId(i);
+        int stones = board.get(pitId);
+        board.put(pitId, 0);
+        int lastFilledPit = 0;
+        int stonesMoved = 0;
+        int pitToFill = pitId + 1;
+
+        while (stonesMoved != stones) {
+            lastFilledPit = pitToFill > secondPlayerKalah ? pitToFill - secondPlayerKalah : pitToFill;
 
             // Stone cannot be put on opponent kalah
-            if (player.getOppositePlayer().getKalahId() == lastFilledPit) {
-                i++;
+            if (player.getOppositePlayer().getKalahId() != pitToFill) {
+                board.put(lastFilledPit, board.get(lastFilledPit) + 1 );
+                stonesMoved++;
+            } else {
                 stones++;
-                lastFilledPit = convertOverflowPitId(i);
             }
-            board.put(lastFilledPit, board.get(lastFilledPit) + 1 );
+            pitToFill++;
         }
+
         game.setCurrentPlayer(getNextPlayerLastPit(player, board, lastFilledPit));
+
+        return game;
     }
 
     /**
@@ -98,16 +106,6 @@ class GameUtils {
         }
 
         return validMove;
-    }
-
-    /**
-     * Converts a pit ID to its board equivalent if the pit ID is greater than the maximum of pits.
-     *
-     * @param pitId Pit ID to be converted.
-     * @return The pit ID converted to its board equivalent.
-     */
-    private int convertOverflowPitId(int pitId) {
-        return pitId > BoardConfig.SECOND_PLAYER_KALAH ? pitId - BoardConfig.SECOND_PLAYER_KALAH : pitId;
     }
 
     /**
