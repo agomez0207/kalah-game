@@ -1,5 +1,6 @@
 package com.backbase.game.rest.controller.advice;
 
+import com.backbase.game.service.exceptions.GameFinishedException;
 import com.backbase.game.service.exceptions.GameNotFoundException;
 import com.backbase.game.service.exceptions.MoveNotValidException;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,12 @@ public class KalahRestControllerAdvice {
     @ExceptionHandler(value= {MoveNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionResponseMessage moveNotValid(MoveNotValidException exception){
+        return new ExceptionResponseMessage(exception.getMessage());
+    }
+
+    @ExceptionHandler(value= {GameFinishedException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionResponseMessage GameFinished(GameFinishedException exception){
         return new ExceptionResponseMessage(exception.getMessage());
     }
 }
