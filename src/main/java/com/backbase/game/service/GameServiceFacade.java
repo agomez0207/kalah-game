@@ -4,18 +4,19 @@ import com.backbase.game.service.bo.BoardConfig;
 import com.backbase.game.service.bo.Game;
 import com.backbase.game.service.bo.Player;
 import com.backbase.game.service.exceptions.MoveNotValidException;
+
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 /**
- * Utility service class that move the stones and contains some of the rules of the game
+ * Service facade that move the stones and contains some of the rules of the game
  * such as if a player keeps or loose his/her turn.
  *
  * @author andres.gomez
  */
 @Component
-class GameUtils {
+class GameServiceFacade {
 
     /**
      * Moves stones starting from the required {@param pitId} only if it's a valid move.
@@ -47,11 +48,9 @@ class GameUtils {
             lastFilledPit = pitToFill > secondPlayerKalah ? pitToFill - secondPlayerKalah : pitToFill;
 
             // Stone cannot be put on opponent kalah
-            if (player.getOppositePlayer().getKalahId() != pitToFill) {
+            if (player.getOppositePlayer().getKalahId() != lastFilledPit) {
                 board.put(lastFilledPit, board.get(lastFilledPit) + 1 );
                 stonesMoved++;
-            } else {
-                stones++;
             }
             pitToFill++;
         }

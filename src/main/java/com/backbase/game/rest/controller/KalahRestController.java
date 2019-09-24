@@ -21,7 +21,7 @@ public class KalahRestController {
         this.gameService = gameService;
         this.controllerMapper = controllerMapper;
     }
-    
+
     @PostMapping(path = "/games", consumes = "application/json")
     public NewGameDTO createGame(HttpServletRequest httpServletRequest) {
         String uri = httpServletRequest.getRequestURL().toString();

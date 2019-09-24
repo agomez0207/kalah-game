@@ -24,13 +24,13 @@ class GameServiceImpl implements GameService {
 
     private GameRepository gameRepository;
     private GameMapper gameMapper;
-    private GameUtils gameUtils;
+    private GameServiceFacade gameServiceFacade;
 
     GameServiceImpl(
-            final GameRepository gameRepository, final GameMapper gameMapper, final GameUtils gameUtils) {
+            final GameRepository gameRepository, final GameMapper gameMapper, final GameServiceFacade gameServiceFacade) {
         this.gameRepository = gameRepository;
         this.gameMapper = gameMapper;
-        this.gameUtils = gameUtils;
+        this.gameServiceFacade = gameServiceFacade;
     }
 
     /**
@@ -69,7 +69,7 @@ class GameServiceImpl implements GameService {
                         String.format("The game has been already finished with status of %s", game.getStatus()));
             }
 
-            Game gameUpdated = gameUtils.moveStones(game, pitId);
+            Game gameUpdated = gameServiceFacade.moveStones(game, pitId);
 
             if (isGameFinished(gameUpdated)) {
                 finishGame(gameUpdated);
