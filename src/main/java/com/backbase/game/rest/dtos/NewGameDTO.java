@@ -1,5 +1,10 @@
 package com.backbase.game.rest.dtos;
 
+/**
+ * New game data transfer object (DTO)
+ *
+ * @author andres.gomez
+ */
 public class NewGameDTO {
 
     private int id;

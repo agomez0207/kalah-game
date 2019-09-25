@@ -1,5 +1,8 @@
 package com.backbase.game.rest.controller.advice;
 
+/**
+ * Class representing a exception response.
+ */
 class ExceptionResponseMessage {
     private String exceptionMessage;
 

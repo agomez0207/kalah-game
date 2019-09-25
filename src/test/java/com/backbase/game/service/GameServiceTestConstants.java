@@ -1,6 +1,8 @@
 package com.backbase.game.service;
 
 import com.backbase.game.repository.dao.GameDAO;
+import com.backbase.game.rest.dtos.GameDTO;
+import com.backbase.game.rest.dtos.NewGameDTO;
 import com.backbase.game.service.bo.BoardConfig;
 import com.backbase.game.service.bo.Game;
 import com.backbase.game.service.bo.GameStatus;
@@ -9,16 +11,21 @@ import com.backbase.game.service.bo.Player;
 import java.util.HashMap;
 import java.util.Map;
 
-class GameServiceTestConstants {
+/**
+ * Utility class for testing that holds constants, game object creation and board creation.
+ */
+public class GameServiceTestConstants {
     private static final Map<Integer, Integer> INITIAL_BOARD = BoardConfig.INITIAL_BOARD;
     private static final Player FIRST_PLAYER = Player.FIRST_PLAYER;
-    static final int GAME_ID = 1;
+
+    public static final int GAME_ID = 1;
+    public static final String URI = "https://testing-uri.com";
+    public static final int STARTER_PIT_ID = 2;
+
     static final GameStatus DREW_STATUS = GameStatus.DREW;
     static final GameStatus SECOND_PLAYER_WON_STATUS = GameStatus.SECOND_PLAYER_WON;
     static final GameStatus FIRST_PLAYER_WON_STATUS = GameStatus.FIRST_PLAYER_WON;
-    static final String URI = "https://testing-uri.com";
     static final String URI_ID = URI + "/" + GAME_ID;
-    static final int STARTER_PIT_ID = 2;
     static final int FIRST_PIT_ID = 1;
     static final int SECOND_PLAYER_PIT_ID = 8;
     static final Map<Integer, Integer> BOARD_STONES_MOVED =
@@ -108,29 +115,6 @@ class GameServiceTestConstants {
                 put(13, 10);
                 put(14, 0);
             }};
-    static Game getGame() {
-        Game game = new Game();
-
-        game.setId(GameServiceTestConstants.GAME_ID);
-        game.setCurrentPlayer(GameServiceTestConstants.FIRST_PLAYER);
-        game.setUri(GameServiceTestConstants.URI);
-        game.setBoard(GameServiceTestConstants.INITIAL_BOARD);
-        game.setStatus(GameStatus.IN_PROGRESS);
-
-        return game;
-    }
-
-    static GameDAO getGameDAO() {
-        GameDAO gameDAO = new GameDAO();
-
-        gameDAO.setId(GameServiceTestConstants.GAME_ID);
-        gameDAO.setCurrentPlayer(GameServiceTestConstants.FIRST_PLAYER.toString());
-        gameDAO.setUri(GameServiceTestConstants.URI);
-        gameDAO.setBoard(GameServiceTestConstants.INITIAL_BOARD);
-        gameDAO.setStatus(GameStatus.IN_PROGRESS.toString());
-
-        return gameDAO;
-    }
 
     static Map<Integer, Integer> getNewFinishedBoard() {
         return new HashMap<Integer, Integer>() {{
@@ -149,5 +133,48 @@ class GameServiceTestConstants {
             put(13, 6);
             put(14, 0);
         }};
+    }
+
+    public static Game getGame() {
+        Game game = new Game();
+
+        game.setId(GameServiceTestConstants.GAME_ID);
+        game.setCurrentPlayer(GameServiceTestConstants.FIRST_PLAYER);
+        game.setUri(GameServiceTestConstants.URI);
+        game.setBoard(GameServiceTestConstants.INITIAL_BOARD);
+        game.setStatus(GameStatus.IN_PROGRESS);
+
+        return game;
+    }
+
+    public static GameDAO getGameDAO() {
+        GameDAO gameDAO = new GameDAO();
+
+        gameDAO.setId(GameServiceTestConstants.GAME_ID);
+        gameDAO.setCurrentPlayer(GameServiceTestConstants.FIRST_PLAYER.toString());
+        gameDAO.setUri(GameServiceTestConstants.URI);
+        gameDAO.setBoard(GameServiceTestConstants.INITIAL_BOARD);
+        gameDAO.setStatus(GameStatus.IN_PROGRESS.toString());
+
+        return gameDAO;
+    }
+
+    public static GameDTO getGameDTO() {
+        GameDTO gameDTO = new GameDTO();
+
+        gameDTO.setId(GameServiceTestConstants.GAME_ID);
+        gameDTO.setUri(GameServiceTestConstants.URI);
+        gameDTO.setBoard(GameServiceTestConstants.INITIAL_BOARD);
+
+        return gameDTO;
+    }
+
+    public static NewGameDTO getNewGameDTO() {
+        NewGameDTO newGameDTO = new NewGameDTO();
+
+        newGameDTO.setId(GameServiceTestConstants.GAME_ID);
+        newGameDTO.setUri(GameServiceTestConstants.URI);
+
+        return newGameDTO;
     }
 }

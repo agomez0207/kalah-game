@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameServiceFacade.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">game</a> &gt; <a href="index.source.html" class="el_package">com.backbase.game.service</a> &gt; <span class="el_source">GameServiceFacade.java</span></div><h1>GameServiceFacade.java</h1><pre class="source lang-java linenums">package com.backbase.game.service;
+
+import com.backbase.game.service.bo.BoardConfig;
+import com.backbase.game.service.bo.Game;
+import com.backbase.game.service.bo.Player;
+import com.backbase.game.service.exceptions.MoveNotValidException;
+
+import org.springframework.stereotype.Component;
+
+import java.util.Map;
+
+/**
+ * Service facade that move the stones and contains some of the rules of the game
+ * such as if a player keeps or loose his/her turn.
+ *
+ * @author andres.gomez
+ */
+@Component
+<span class="fc" id="L19">class GameServiceFacade {</span>
+
+    /**
+     * Moves stones starting from the required {@param pitId} only if it's a valid move.
+     *
+     * @param game Game instance to be used.
+     * @param pitId Pit id to move the stones from.
+     *
+     * @throws MoveNotValidException if a player tries to move the stones from
+     * a pit and it's not his/her turn or if tries to move the opponent stones.
+     */
+    Game moveStones(Game game, final int pitId) {
+<span class="fc" id="L31">        Player player = game.getCurrentPlayer();</span>
+
+<span class="pc bpc" id="L33" title="1 of 4 branches missed.">        if (!isValidMove(player, pitId) || game.getBoard().get(pitId) == 0) {</span>
+<span class="fc" id="L34">            throw new MoveNotValidException(</span>
+<span class="fc" id="L35">                String.format(&quot;The stones on the pit ID %d cannot be moved or the pit is empty&quot;, pitId));</span>
+        }
+
+<span class="fc" id="L38">        Map&lt;Integer, Integer&gt; board = game.getBoard();</span>
+<span class="fc" id="L39">        int secondPlayerKalah = BoardConfig.SECOND_PLAYER_KALAH;</span>
+
+<span class="fc" id="L41">        int stones = board.get(pitId);</span>
+<span class="fc" id="L42">        board.put(pitId, 0);</span>
+<span class="fc" id="L43">        int lastFilledPit = 0;</span>
+<span class="fc" id="L44">        int stonesMoved = 0;</span>
+<span class="fc" id="L45">        int pitToFill = pitId + 1;</span>
+
+<span class="fc bfc" id="L47" title="All 2 branches covered.">        while (stonesMoved != stones) {</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">            lastFilledPit = pitToFill &gt; secondPlayerKalah ? pitToFill - secondPlayerKalah : pitToFill;</span>
+
+            // Stone cannot be put on opponent kalah
+<span class="fc bfc" id="L51" title="All 2 branches covered.">            if (player.getOppositePlayer().getKalahId() != lastFilledPit) {</span>
+<span class="fc" id="L52">                board.put(lastFilledPit, board.get(lastFilledPit) + 1 );</span>
+<span class="fc" id="L53">                stonesMoved++;</span>
+            }
+<span class="fc" id="L55">            pitToFill++;</span>
+        }
+
+<span class="fc" id="L58">        game.setCurrentPlayer(getNextPlayerLastPit(player, board, lastFilledPit));</span>
+
+<span class="fc" id="L60">        return game;</span>
+    }
+
+    /**
+     * Helper method that determines if the player loose his/her turn and/or takes
+     * opponent's pit stones.
+     *
+     * @param player Current player.
+     * @param board Board of the game.
+     * @param lastPit Pit ID where the last stone landed.
+     * @return The next player to play.
+     */
+    private Player getNextPlayerLastPit(
+            final Player player, Map&lt;Integer, Integer&gt; board, final int lastPit) {
+<span class="fc" id="L74">        Player currentPlayer = player;</span>
+
+<span class="fc bfc" id="L76" title="All 4 branches covered.">        if (board.get(lastPit) == 1 &amp;&amp; isValidMove(player, lastPit)) {</span>
+<span class="fc" id="L77">            takesOpponentStones(player, board, lastPit);</span>
+<span class="fc" id="L78">            currentPlayer = player.getOppositePlayer();</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">        } else if (player.getKalahId() != lastPit) {</span>
+<span class="fc" id="L80">            currentPlayer = player.getOppositePlayer();</span>
+        }
+
+<span class="fc" id="L83">        return currentPlayer;</span>
+    }
+
+    /**
+     * Checks if the move of stones is valid.
+     *
+     * @param currentPlayer Player that makes the move.
+     * @param starterPit Starter pit ID of the move.
+     * @return True if the move is valid otherwise will returns false.
+     */
+    private boolean isValidMove(Player currentPlayer, int starterPit) {
+<span class="fc" id="L94">        boolean validMove = false;</span>
+
+<span class="pc bpc" id="L96" title="1 of 3 branches missed.">        switch (currentPlayer){</span>
+            case FIRST_PLAYER:
+<span class="fc bfc" id="L98" title="All 2 branches covered.">                validMove = starterPit &lt; BoardConfig.FIRST_PLAYER_KALAH;</span>
+<span class="fc" id="L99">                break;</span>
+            case SECOND_PLAYER:
+<span class="pc bpc" id="L101" title="1 of 4 branches missed.">                validMove = starterPit &lt; BoardConfig.SECOND_PLAYER_KALAH &amp;&amp; starterPit &gt; BoardConfig.FIRST_PLAYER_KALAH;</span>
+<span class="fc" id="L102">                break;</span>
+            default:
+                break;
+        }
+
+<span class="fc" id="L107">        return validMove;</span>
+    }
+
+    /**
+     * Takes all stones of the opponent and updates the board.
+     *
+     * @param player Player that will take the stones.
+     * @param board Board of the game.
+     * @param pitId Pit ID of the player to take opponent's stones.
+     */
+    private void takesOpponentStones(Player player, Map&lt;Integer, Integer&gt; board, int pitId) {
+<span class="fc" id="L118">        int currentPlayerKalahStones = board.get(player.getKalahId());</span>
+<span class="fc" id="L119">        int opponentPit = BoardConfig.SECOND_PLAYER_KALAH - pitId;</span>
+<span class="fc" id="L120">        int opponentStones = board.get(opponentPit);</span>
+<span class="fc" id="L121">        board.put(opponentPit, 0);</span>
+<span class="fc" id="L122">        board.put(pitId, 0);</span>
+<span class="fc" id="L123">        board.put(player.getKalahId(), opponentStones + currentPlayerKalahStones + 1);</span>
+<span class="fc" id="L124">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

@@ -18,6 +18,8 @@ import java.util.Optional;
 
 /**
  * @see GameService
+ *
+ * @author andres.gomez
  */
 @Service
 class GameServiceImpl implements GameService {
@@ -27,7 +29,9 @@ class GameServiceImpl implements GameService {
     private GameServiceFacade gameServiceFacade;
 
     GameServiceImpl(
-            final GameRepository gameRepository, final GameMapper gameMapper, final GameServiceFacade gameServiceFacade) {
+            final GameRepository gameRepository,
+            final GameMapper gameMapper,
+            final GameServiceFacade gameServiceFacade) {
         this.gameRepository = gameRepository;
         this.gameMapper = gameMapper;
         this.gameServiceFacade = gameServiceFacade;

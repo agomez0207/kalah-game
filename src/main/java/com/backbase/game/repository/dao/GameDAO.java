@@ -31,50 +31,43 @@ public class GameDAO {
 
     private String uri;
 
-    public GameDAO() {
-    }
-
-    public GameDAO(Map<Integer, Integer> initialBoard) {
-        this.board = initialBoard;
-    }
-
     public int getId() {
         return id;
-    }
-
-    public String getCurrentPlayer() {
-        return currentPlayer;
     }
 
     public void setId(int id) {
         this.id = id;
     }
 
-    public Map<Integer, Integer> getBoard() {
-        return board;
+    public String getUri() {
+        return uri;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 
-    public void setBoard(Map<Integer, Integer> board) {
-        this.board = board;
+    public String getCurrentPlayer() {
+        return currentPlayer;
     }
 
     public void setCurrentPlayer(String currentPlayer) {
         this.currentPlayer = currentPlayer;
     }
 
-    public String getUri() {
-        return uri;
+    public Map<Integer, Integer> getBoard() {
+        return board;
+    }
+
+    public void setBoard(Map<Integer, Integer> board) {
+        this.board = board;
     }
 
     public String getStatus() {
         return status;
     }
 
-    public void setUri(String uri) {
-        this.uri = uri;
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

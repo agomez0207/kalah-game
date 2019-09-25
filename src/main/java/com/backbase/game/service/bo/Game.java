@@ -3,7 +3,7 @@ package com.backbase.game.service.bo;
 import java.util.Map;
 
 /**
- * Game business object.
+ * Game business object (BO).
  *
  * @author andres.gomez
  */

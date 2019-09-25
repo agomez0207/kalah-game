@@ -3,11 +3,17 @@ package com.backbase.game.service;
 import com.backbase.game.service.bo.Game;
 import com.backbase.game.service.bo.Player;
 import com.backbase.game.service.exceptions.MoveNotValidException;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
+/**
+ * Unit test for {@link GameServiceFacade}
+ *
+ * @author andres.gomez
+ */
 public class GameServiceFacadeTest {
 
     private GameServiceFacade gameServiceFacade;
@@ -22,7 +28,7 @@ public class GameServiceFacadeTest {
     public void moveStonesTest() {
         Game gameUpdated = gameServiceFacade.moveStones(game, GameServiceTestConstants.STARTER_PIT_ID);
 
-        assertEquals(gameUpdated.getBoard(), GameServiceTestConstants.BOARD_STONES_MOVED);
+        assertEquals(GameServiceTestConstants.BOARD_STONES_MOVED, gameUpdated.getBoard());
     }
 
     @Test(expected = MoveNotValidException.class)
@@ -35,7 +41,7 @@ public class GameServiceFacadeTest {
         game.setBoard(GameServiceTestConstants.BOARD_STONES_OVERFLOW);
         Game gameUpdated = gameServiceFacade.moveStones(game, GameServiceTestConstants.STARTER_PIT_ID);
 
-        assertEquals(gameUpdated.getBoard(), GameServiceTestConstants.BOARD_STONES_OVERFLOW_AFTER_MOVE);
+        assertEquals(GameServiceTestConstants.BOARD_STONES_OVERFLOW_AFTER_MOVE, gameUpdated.getBoard());
     }
 
     @Test
@@ -45,8 +51,8 @@ public class GameServiceFacadeTest {
 
         Game gameUpdated = gameServiceFacade.moveStones(game, GameServiceTestConstants.STARTER_PIT_ID);
 
-        assertEquals(gameUpdated.getBoard(), GameServiceTestConstants.BOARD_STONES_TAKES_OPPONENT_STONES_AFTER_MOVE);
-        assertEquals(gameUpdated.getCurrentPlayer(), currentPlayer.getOppositePlayer());
+        assertEquals(GameServiceTestConstants.BOARD_STONES_TAKES_OPPONENT_STONES_AFTER_MOVE, gameUpdated.getBoard());
+        assertEquals(currentPlayer.getOppositePlayer(), gameUpdated.getCurrentPlayer());
     }
 
     @Test
@@ -55,7 +61,7 @@ public class GameServiceFacadeTest {
 
         Game gameUpdated = gameServiceFacade.moveStones(game, GameServiceTestConstants.FIRST_PIT_ID);
 
-        assertEquals(gameUpdated.getCurrentPlayer(), currentPlayer);
+        assertEquals(currentPlayer, gameUpdated.getCurrentPlayer());
     }
 
     @Test
@@ -64,5 +70,7 @@ public class GameServiceFacadeTest {
 
         Game gameUpdated =
                 gameServiceFacade.moveStones(game, GameServiceTestConstants.SECOND_PLAYER_PIT_ID);
+
+        assertEquals(Player.FIRST_PLAYER, gameUpdated.getCurrentPlayer());
     }
 }

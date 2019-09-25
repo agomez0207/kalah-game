@@ -21,6 +21,9 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit test for {@link GameServiceImpl}
+ */
 public class GameServiceImplTest {
 
     private GameServiceImpl gameService;
@@ -62,7 +65,7 @@ public class GameServiceImplTest {
         verify(gameRepository, times(2)).save(gameDAO);
         verify(gameMapper, times(2)).getGame(gameDAO);
 
-        assertEquals(gameCreated.getUri(), GameServiceTestConstants.URI_ID);
+        assertEquals(GameServiceTestConstants.URI_ID, gameCreated.getUri());
     }
 
     @Test
@@ -81,7 +84,7 @@ public class GameServiceImplTest {
         Game movedGame = gameService.makeMove(
                 GameServiceTestConstants.GAME_ID, GameServiceTestConstants.STARTER_PIT_ID);
 
-        assertEquals(movedGame.getBoard(), GameServiceTestConstants.BOARD_STONES_MOVED);
+        assertEquals(GameServiceTestConstants.BOARD_STONES_MOVED, movedGame.getBoard());
 
         runMakeMoveVerifies();
     }
@@ -106,8 +109,8 @@ public class GameServiceImplTest {
         Game movedGame = gameService.makeMove(
                 GameServiceTestConstants.GAME_ID, GameServiceTestConstants.STARTER_PIT_ID);
 
-        assertEquals(movedGame.getBoard(), FINISHED_BOARD);
-        assertEquals(movedGame.getStatus(), GameServiceTestConstants.DREW_STATUS);
+        assertEquals(FINISHED_BOARD, movedGame.getBoard());
+        assertEquals(GameServiceTestConstants.DREW_STATUS, movedGame.getStatus());
 
         runMakeMoveVerifies();
     }
@@ -131,8 +134,8 @@ public class GameServiceImplTest {
         Game movedGame = gameService.makeMove(
                 GameServiceTestConstants.GAME_ID, GameServiceTestConstants.STARTER_PIT_ID);
 
-        assertEquals(movedGame.getBoard(), FINISHED_BOARD);
-        assertEquals(movedGame.getStatus(), GameServiceTestConstants.SECOND_PLAYER_WON_STATUS);
+        assertEquals(FINISHED_BOARD, movedGame.getBoard());
+        assertEquals(GameServiceTestConstants.SECOND_PLAYER_WON_STATUS, movedGame.getStatus());
 
         runMakeMoveVerifies();
     }
@@ -157,8 +160,8 @@ public class GameServiceImplTest {
         Game movedGame = gameService.makeMove(
                 GameServiceTestConstants.GAME_ID, GameServiceTestConstants.STARTER_PIT_ID);
 
-        assertEquals(movedGame.getBoard(), FINISHED_BOARD);
-        assertEquals(movedGame.getStatus(), GameServiceTestConstants.FIRST_PLAYER_WON_STATUS);
+        assertEquals(FINISHED_BOARD, movedGame.getBoard());
+        assertEquals(GameServiceTestConstants.FIRST_PLAYER_WON_STATUS, movedGame.getStatus());
 
         runMakeMoveVerifies();
     }
